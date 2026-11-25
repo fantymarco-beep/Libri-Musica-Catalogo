@@ -1,0 +1,16 @@
+# Escludi raccolte libri, riviste e file binari pesanti
+Classic Rock/
+Classifiche/
+Monografie/
+Storia/
+Varie/
+The Encyclopedia of Popular Music- Larkin, Colin/
+*.pdf
+*.epub
+*.mobi
+*.cbr
+*.cbz
+*.djvu
+sync.ffs_lock
+__pycache__/
+*.pyc

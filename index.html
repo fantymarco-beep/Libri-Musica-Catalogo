@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogo Libri Musica & Gemini NotebookLM</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0b0f19;
+      color: #f1f5f9;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #111827;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #374151;
+      border-radius: 3px;
+    }
+    .card-glass {
+      background: rgba(17, 24, 39, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .card-glass:hover {
+      border-color: rgba(99, 102, 241, 0.35);
+    }
+    .card-uploaded {
+      border-color: rgba(16, 185, 129, 0.35);
+      background: rgba(6, 78, 59, 0.15);
+    }
+    .card-uploaded:hover {
+      border-color: rgba(16, 185, 129, 0.6);
+    }
+    /* Checkbox animation */
+    .checkbox-gemini {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .checkbox-gemini:hover {
+      transform: scale(1.08);
+    }
+  </style>
+</head>
+<body class="min-h-screen custom-scroll flex flex-col">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-50 bg-[#0b0f19]/90 backdrop-blur-md border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+          <i data-lucide="music-2" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            Libreria Musicale
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Catalog & NotebookLM Tracker</span>
+          </h1>
+          <p class="text-xs text-gray-400">Gestione archivio digitale & caricamento taccuini</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <!-- Direct Link to NotebookLM -->
+        <a href="https://notebooklm.google.com" target="_blank" rel="noopener noreferrer" 
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold shadow-md shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
+          <i data-lucide="sparkles" class="w-4 h-4 text-blue-200"></i>
+          <span>Apri Gemini NotebookLM</span>
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-blue-200 opacity-80"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- KPI STATS CARDS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <!-- Total -->
+      <div class="card-glass p-4 rounded-2xl relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Totale Opere</span>
+          <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+            <i data-lucide="library" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="stat-total" class="text-2xl font-bold text-white">220</span>
+          <span class="text-xs text-gray-400">volumi</span>
+        </div>
+      </div>
+
+      <!-- Uploaded to Gemini -->
+      <div class="card-glass p-4 rounded-2xl relative overflow-hidden border-emerald-500/20 bg-emerald-950/10">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-emerald-400 uppercase tracking-wider">Caricati in Gemini</span>
+          <div class="p-2 rounded-lg bg-emerald-500/20 text-emerald-300">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="stat-uploaded" class="text-2xl font-bold text-emerald-400">0</span>
+          <span id="stat-percentage" class="text-xs font-semibold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">0%</span>
+        </div>
+      </div>
+
+      <!-- Remaining -->
+      <div class="card-glass p-4 rounded-2xl relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-amber-400 uppercase tracking-wider">Da Caricare</span>
+          <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+            <i data-lucide="clock" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="stat-remaining" class="text-2xl font-bold text-white">220</span>
+          <span class="text-xs text-gray-400">opere</span>
+        </div>
+      </div>
+
+      <!-- Formats -->
+      <div class="card-glass p-4 rounded-2xl relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Formati</span>
+          <div class="p-2 rounded-lg bg-purple-500/10 text-purple-400">
+            <i data-lucide="file-type" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center gap-3 text-xs">
+          <div class="flex items-center gap-1 font-semibold text-rose-400">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span id="stat-pdf">159</span> PDF
+          </div>
+          <div class="flex items-center gap-1 font-semibold text-sky-400">
+            <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+            <span id="stat-epub">61</span> EPUB
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div class="card-glass p-3 rounded-xl flex items-center gap-4">
+      <span class="text-xs font-semibold text-gray-300 whitespace-nowrap flex items-center gap-1.5">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-indigo-400"></i> Avanzamento NotebookLM:
+      </span>
+      <div class="w-full bg-gray-800 rounded-full h-2.5 overflow-hidden relative">
+        <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 h-2.5 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+      </div>
+      <span id="progress-text" class="text-xs font-bold text-emerald-400 whitespace-nowrap min-w-[40px] text-right">0%</span>
+    </div>
+
+    <!-- TOOLBAR & FILTERS -->
+    <div class="card-glass p-4 rounded-2xl space-y-4">
+      <!-- Search & Main Status Filters -->
+      <div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+        <!-- Search Input -->
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <input type="text" id="search-input" placeholder="Cerca per titolo, autore, anno, note..." 
+                 class="w-full pl-10 pr-10 py-2.5 bg-gray-900/90 border border-gray-700/80 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
+          <button id="clear-search" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <!-- Filter Status Radio Buttons -->
+        <div class="flex items-center gap-1 bg-gray-900/90 p-1 rounded-xl border border-gray-700/80 text-xs font-medium">
+          <button class="status-filter-btn px-3 py-1.5 rounded-lg transition-all bg-indigo-600 text-white shadow-sm" data-status="all">
+            Tutti (<span id="count-all">220</span>)
+          </button>
+          <button class="status-filter-btn px-3 py-1.5 rounded-lg transition-all text-gray-400 hover:text-white" data-status="uploaded">
+            ✅ Caricati (<span id="count-uploaded">0</span>)
+          </button>
+          <button class="status-filter-btn px-3 py-1.5 rounded-lg transition-all text-gray-400 hover:text-white" data-status="pending">
+            ⏳ Da Caricare (<span id="count-pending">220</span>)
+          </button>
+        </div>
+
+        <!-- View Mode & Sort Dropdowns -->
+        <div class="flex items-center gap-2">
+          <!-- Sort -->
+          <div class="relative">
+            <select id="sort-select" class="appearance-none bg-gray-900/90 border border-gray-700/80 rounded-xl px-3 py-2 pr-8 text-xs font-medium text-gray-200 focus:outline-none focus:border-indigo-500">
+              <option value="year-desc">Anno (Più recenti)</option>
+              <option value="year-asc">Anno (Meno recenti)</option>
+              <option value="title-asc">Titolo (A - Z)</option>
+              <option value="author-asc">Autore (A - Z)</option>
+              <option value="size-desc">Dimensione (Più grandi)</option>
+            </select>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+          </div>
+
+          <!-- View Toggle -->
+          <div class="flex items-center bg-gray-900/90 border border-gray-700/80 rounded-xl p-0.5">
+            <button id="view-cards-btn" class="p-1.5 rounded-lg bg-indigo-600 text-white" title="Vista Schede">
+              <i data-lucide="layout-grid" class="w-4 h-4"></i>
+            </button>
+            <button id="view-table-btn" class="p-1.5 rounded-lg text-gray-400 hover:text-white" title="Vista Elenco Compatto">
+              <i data-lucide="list" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scroll text-xs">
+        <span class="text-gray-400 font-medium mr-1 whitespace-nowrap">Categoria:</span>
+        <button class="cat-pill active px-3 py-1 rounded-full bg-gray-800 text-white hover:bg-gray-700 border border-gray-700 transition-all whitespace-nowrap" data-cat="all">
+          Tutte (220)
+        </button>
+        <button class="cat-pill px-3 py-1 rounded-full bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all whitespace-nowrap" data-cat="Classic Rock">
+          Classic Rock (46)
+        </button>
+        <button class="cat-pill px-3 py-1 rounded-full bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all whitespace-nowrap" data-cat="Classifiche">
+          Classifiche (75)
+        </button>
+        <button class="cat-pill px-3 py-1 rounded-full bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all whitespace-nowrap" data-cat="Storia">
+          Storia (53)
+        </button>
+        <button class="cat-pill px-3 py-1 rounded-full bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all whitespace-nowrap" data-cat="Monografie">
+          Monografie (24)
+        </button>
+        <button class="cat-pill px-3 py-1 rounded-full bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all whitespace-nowrap" data-cat="The Encyclopedia of Popular Music- Larkin, Colin">
+          Encyclopedia Larkin (19)
+        </button>
+        <button class="cat-pill px-3 py-1 rounded-full bg-gray-900 text-gray-400 hover:text-white border border-gray-800 transition-all whitespace-nowrap" data-cat="Varie">
+          Varie (3)
+        </button>
+      </div>
+
+      <!-- Format Filter Pills -->
+      <div class="flex items-center gap-2 pt-1 border-t border-gray-800/80 text-xs">
+        <span class="text-gray-400 font-medium">Formato:</span>
+        <label class="inline-flex items-center gap-1.5 cursor-pointer text-gray-300">
+          <input type="radio" name="format-filter" value="all" checked class="text-indigo-600 focus:ring-0">
+          Tutti
+        </label>
+        <label class="inline-flex items-center gap-1.5 cursor-pointer text-gray-300">
+          <input type="radio" name="format-filter" value="PDF" class="text-indigo-600 focus:ring-0">
+          Solo PDF
+        </label>
+        <label class="inline-flex items-center gap-1.5 cursor-pointer text-gray-300">
+          <input type="radio" name="format-filter" value="EPUB" class="text-indigo-600 focus:ring-0">
+          Solo EPUB
+        </label>
+        <span class="ml-auto text-gray-400" id="filtered-count-text">Visualizzate: 220 di 220</span>
+      </div>
+    </div>
+
+    <!-- BOOK LIST / CARDS CONTAINER -->
+    <div id="books-container" class="space-y-3">
+      <!-- Dynamic list populated by JS -->
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div id="empty-state" class="hidden card-glass p-12 text-center rounded-2xl space-y-3">
+      <div class="w-12 h-12 rounded-full bg-gray-800 text-gray-400 flex items-center justify-center mx-auto">
+        <i data-lucide="search-x" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-base font-semibold text-white">Nessuna opera trovata</h3>
+      <p class="text-xs text-gray-400 max-w-sm mx-auto">Nessun libro o rivista corrisponde ai filtri di ricerca selezionati. Prova a modificare i criteri.</p>
+      <button id="reset-filters-btn" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition-all">
+        Reimposta filtri
+      </button>
+    </div>
+
+  </main>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-gray-900 border border-gray-700 shadow-2xl text-xs font-medium text-white">
+    <i id="toast-icon" data-lucide="check" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toast-msg">Notifica</span>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    let allBooks = [];
+    let currentCategory = 'all';
+    let currentStatus = 'all';
+    let currentFormat = 'all';
+    let currentSearch = '';
+    let currentSort = 'year-desc';
+    let viewMode = 'cards'; // 'cards' or 'table'
+
+    // Load data from backend
+    async function loadBooks() {
+      try {
+        const res = await fetch('/api/libri');
+        if (!res.ok) throw new Error('Network error');
+        allBooks = await res.json();
+        updateStats();
+        render();
+      } catch (err) {
+        console.error("Errore nel caricamento dei dati:", err);
+        showToast("Errore di caricamento dati dal server", "alert-circle", "text-rose-400");
+      }
+    }
+
+    // Update KPIs & Progress Bar
+    function updateStats() {
+      const total = allBooks.length;
+      const uploaded = allBooks.filter(b => b.caricato_gemini).length;
+      const remaining = total - uploaded;
+      const pct = total > 0 ? Math.round((uploaded / total) * 100) : 0;
+
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-uploaded').textContent = uploaded;
+      document.getElementById('stat-remaining').textContent = remaining;
+      document.getElementById('stat-percentage').textContent = pct + '%';
+      
+      document.getElementById('progress-bar').style.width = pct + '%';
+      document.getElementById('progress-text').textContent = pct + '%';
+
+      document.getElementById('count-all').textContent = total;
+      document.getElementById('count-uploaded').textContent = uploaded;
+      document.getElementById('count-pending').textContent = remaining;
+
+      const pdfCount = allBooks.filter(b => b.formato === 'PDF').length;
+      const epubCount = allBooks.filter(b => b.formato === 'EPUB').length;
+      document.getElementById('stat-pdf').textContent = pdfCount;
+      document.getElementById('stat-epub').textContent = epubCount;
+    }
+
+    // Toggle Checkbox Gemini Upload
+    async function toggleGemini(id, event) {
+      if (event) event.stopPropagation();
+      try {
+        const res = await fetch('/api/libri/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id })
+        });
+        const data = await res.json();
+        if (data.success) {
+          const item = allBooks.find(b => b.id === id);
+          if (item) {
+            item.caricato_gemini = data.item.caricato_gemini;
+            item.data_caricamento = data.item.data_caricamento;
+          }
+          updateStats();
+          render();
+          if (data.item.caricato_gemini) {
+            showToast("Segnato come CARICATO su Gemini Notebook!", "check-circle", "text-emerald-400");
+          } else {
+            showToast("Rimosso da Gemini Notebook", "minus-circle", "text-amber-400");
+          }
+        }
+      } catch (err) {
+        console.error("Errore nel salvataggio:", err);
+        showToast("Errore nel salvataggio dello stato", "alert-triangle", "text-rose-400");
+      }
+    }
+
+    // Open file on user machine
+    async function openFile(id, event) {
+      if (event) event.stopPropagation();
+      try {
+        showToast("Apertura file in corso...", "external-link", "text-blue-400");
+        const res = await fetch('/api/libri/open', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id })
+        });
+        const data = await res.json();
+        if (!data.success) {
+          showToast(data.error || "Impossibile aprire il file", "alert-circle", "text-rose-400");
+        }
+      } catch (err) {
+        showToast("Errore durante l'apertura del file", "alert-triangle", "text-rose-400");
+      }
+    }
+
+    // Save note
+    async function saveNote(id, noteText) {
+      try {
+        const res = await fetch('/api/libri/note', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id, note: noteText })
+        });
+        const data = await res.json();
+        if (data.success) {
+          const item = allBooks.find(b => b.id === id);
+          if (item) item.note = noteText;
+          showToast("Note aggiornate!", "check", "text-emerald-400");
+        }
+      } catch (err) {
+        showToast("Errore salvataggio nota", "alert-triangle", "text-rose-400");
+      }
+    }
+
+    // Filter and Sort Logic
+    function getFilteredBooks() {
+      return allBooks.filter(item => {
+        // Category
+        if (currentCategory !== 'all' && item.categoria !== currentCategory) return false;
+        // Status
+        if (currentStatus === 'uploaded' && !item.caricato_gemini) return false;
+        if (currentStatus === 'pending' && item.caricato_gemini) return false;
+        // Format
+        if (currentFormat !== 'all' && item.formato !== currentFormat) return false;
+        // Search
+        if (currentSearch) {
+          const q = currentSearch.toLowerCase();
+          const matchTitle = (item.titolo || '').toLowerCase().includes(q);
+          const matchSub = (item.sottotitolo || '').toLowerCase().includes(q);
+          const matchAuthor = (item.autore_o_testata || '').toLowerCase().includes(q);
+          const matchDate = (item.data || '').toLowerCase().includes(q);
+          const matchNote = (item.note || '').toLowerCase().includes(q);
+          if (!matchTitle && !matchSub && !matchAuthor && !matchDate && !matchNote) return false;
+        }
+        return true;
+      }).sort((a, b) => {
+        if (currentSort === 'year-desc') return (b.data || '').localeCompare(a.data || '');
+        if (currentSort === 'year-asc') return (a.data || '').localeCompare(b.data || '');
+        if (currentSort === 'title-asc') return (a.titolo || '').localeCompare(b.titolo || '');
+        if (currentSort === 'author-asc') return (a.autore_o_testata || '').localeCompare(b.autore_o_testata || '');
+        if (currentSort === 'size-desc') return (b.dimensione_mb || 0) - (a.dimensione_mb || 0);
+        return 0;
+      });
+    }
+
+    // Render Cards / Table
+    function render() {
+      const container = document.getElementById('books-container');
+      const emptyState = document.getElementById('empty-state');
+      const filtered = getFilteredBooks();
+
+      document.getElementById('filtered-count-text').textContent = `Visualizzate: ${filtered.length} di ${allBooks.length}`;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        lucide.createIcons();
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      if (viewMode === 'cards') {
+        container.className = "space-y-3";
+        container.innerHTML = filtered.map(b => renderCard(b)).join('');
+      } else {
+        container.className = "card-glass rounded-2xl overflow-hidden";
+        container.innerHTML = renderTable(filtered);
+      }
+
+      lucide.createIcons();
+    }
+
+    // Render Single Card
+    function renderCard(b) {
+      const isUp = b.caricato_gemini;
+      const cardClass = isUp ? 'card-uploaded' : 'card-glass';
+      const checkBg = isUp ? 'bg-emerald-500 border-emerald-400 text-white shadow-lg shadow-emerald-500/30' : 'bg-gray-900 border-gray-600 text-transparent hover:border-indigo-400';
+      const checkIcon = isUp ? '<i data-lucide="check" class="w-4 h-4 stroke-[3]"></i>' : '';
+      
+      const formatBadge = b.formato === 'PDF' 
+        ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">PDF</span>'
+        : '<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20">EPUB</span>';
+
+      const typeBadge = b.tipo === 'Rivista'
+        ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">Rivista / Speciale</span>'
+        : '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Libro</span>';
+
+      const subtitleHtml = b.sottotitolo 
+        ? `<p class="text-xs text-amber-300/90 font-medium mt-0.5 flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0"></i>${b.sottotitolo}</p>` 
+        : '';
+
+      const uploadedBadge = isUp 
+        ? `<div class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+             <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Caricato su Gemini Notebook ${b.data_caricamento ? `(${b.data_caricamento})` : ''}
+           </div>`
+        : `<div class="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500">
+             <i data-lucide="circle-dashed" class="w-3.5 h-3.5"></i> Non ancora caricato in Gemini
+           </div>`;
+
+      return `
+        <div class="${cardClass} p-4 rounded-xl transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          
+          <!-- LEFT: Checkbox + Work Info -->
+          <div class="flex items-start gap-4 flex-1">
+            
+            <!-- Big Tactile Checkbox -->
+            <button onclick="toggleGemini(${b.id}, event)" 
+                    class="checkbox-gemini mt-0.5 w-7 h-7 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer ${checkBg}" 
+                    title="${isUp ? 'Clicca per deselezionare' : 'Clicca per segnare come caricato su Gemini Notebook'}">
+              ${checkIcon}
+            </button>
+
+            <!-- Details -->
+            <div class="space-y-1.5 flex-1 min-w-0">
+              
+              <!-- Badges row -->
+              <div class="flex flex-wrap items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold font-mono bg-gray-800 text-gray-200 border border-gray-700">${b.data}</span>
+                ${formatBadge}
+                ${typeBadge}
+                <span class="text-xs text-gray-400 font-medium">in <strong class="text-gray-300">${b.categoria}</strong></span>
+                <span class="text-xs text-gray-500">• ${b.dimensione_mb} MB</span>
+              </div>
+
+              <!-- Title -->
+              <div>
+                <h3 class="text-sm md:text-base font-semibold text-white tracking-tight leading-snug break-words">
+                  ${b.titolo}
+                </h3>
+                ${subtitleHtml}
+              </div>
+
+              <!-- Author & Upload State -->
+              <div class="flex flex-wrap items-center gap-3 pt-0.5">
+                <div class="text-xs text-gray-300 flex items-center gap-1.5">
+                  <i data-lucide="user" class="w-3.5 h-3.5 text-gray-400"></i>
+                  <span>${b.autore_o_testata || 'Autore sconosciuto'}</span>
+                </div>
+                ${uploadedBadge}
+              </div>
+
+            </div>
+          </div>
+
+          <!-- RIGHT: Actions -->
+          <div class="flex items-center gap-2 self-end md:self-center flex-shrink-0">
+            <!-- Open File Button -->
+            <button onclick="openFile(${b.id}, event)" 
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-200 hover:text-white text-xs font-medium border border-gray-700 transition-all shadow-sm active:scale-95" 
+                    title="Apri file sul computer">
+              <i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-400"></i>
+              <span>Apri File</span>
+            </button>
+          </div>
+
+        </div>
+      `;
+    }
+
+    // Render Compact Table
+    function renderTable(books) {
+      const rows = books.map(b => {
+        const isUp = b.caricato_gemini;
+        const checkBg = isUp ? 'bg-emerald-500 border-emerald-400 text-white' : 'bg-gray-900 border-gray-600 text-transparent';
+        const checkIcon = isUp ? '<i data-lucide="check" class="w-3.5 h-3.5 stroke-[3]"></i>' : '';
+        const rowBg = isUp ? 'bg-emerald-950/20' : 'hover:bg-gray-800/40';
+
+        return `
+          <tr class="${rowBg} border-b border-gray-800/60 transition-colors">
+            <td class="px-4 py-3 text-center">
+              <button onclick="toggleGemini(${b.id}, event)" class="w-5 h-5 rounded border flex items-center justify-center mx-auto ${checkBg}">
+                ${checkIcon}
+              </button>
+            </td>
+            <td class="px-3 py-3 font-mono text-xs font-semibold text-gray-300 whitespace-nowrap">${b.data}</td>
+            <td class="px-4 py-3">
+              <div class="text-xs font-semibold text-white leading-tight">${b.titolo}</div>
+              ${b.sottotitolo ? `<div class="text-[11px] text-amber-300/90 font-medium">${b.sottotitolo}</div>` : ''}
+              <div class="text-[11px] text-gray-400 mt-0.5">${b.autore_o_testata || ''}</div>
+            </td>
+            <td class="px-3 py-3 text-xs text-gray-400 whitespace-nowrap">${b.categoria}</td>
+            <td class="px-3 py-3 text-xs font-bold text-center whitespace-nowrap">
+              ${b.formato === 'PDF' ? '<span class="text-rose-400">PDF</span>' : '<span class="text-sky-400">EPUB</span>'}
+            </td>
+            <td class="px-3 py-3 text-xs text-gray-400 text-right whitespace-nowrap">${b.dimensione_mb} MB</td>
+            <td class="px-4 py-3 text-right whitespace-nowrap">
+              <button onclick="openFile(${b.id}, event)" class="px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-medium border border-gray-700">
+                Apri
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      return `
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-gray-800 bg-gray-900/60 text-[11px] uppercase tracking-wider text-gray-400">
+                <th class="px-4 py-3 text-center w-12">Gemini</th>
+                <th class="px-3 py-3 w-24">Data</th>
+                <th class="px-4 py-3">Titolo & Autore</th>
+                <th class="px-3 py-3 w-32">Categoria</th>
+                <th class="px-3 py-3 w-20 text-center">Formato</th>
+                <th class="px-3 py-3 w-24 text-right">Dim.</th>
+                <th class="px-4 py-3 w-20 text-right">Azione</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // Toast Notification helper
+    function showToast(msg, iconName = 'check', iconColor = 'text-emerald-400') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.textContent = msg;
+      toastIcon.setAttribute('data-lucide', iconName);
+      toastIcon.className = `w-4 h-4 ${iconColor}`;
+      lucide.createIcons();
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+
+    // Event Listeners Setup
+    function setupEvents() {
+      // Search
+      const searchInput = document.getElementById('search-input');
+      const clearSearchBtn = document.getElementById('clear-search');
+
+      searchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value.trim();
+        if (currentSearch) {
+          clearSearchBtn.classList.remove('hidden');
+        } else {
+          clearSearchBtn.classList.add('hidden');
+        }
+        render();
+      });
+
+      clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        currentSearch = '';
+        clearSearchBtn.classList.add('hidden');
+        render();
+      });
+
+      // Status Filter Buttons
+      document.querySelectorAll('.status-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.status-filter-btn').forEach(b => {
+            b.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+            b.classList.add('text-gray-400');
+          });
+          btn.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+          btn.classList.remove('text-gray-400');
+          currentStatus = btn.dataset.status;
+          render();
+        });
+      });
+
+      // Category Pills
+      document.querySelectorAll('.cat-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          document.querySelectorAll('.cat-pill').forEach(p => {
+            p.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-500');
+            p.classList.add('bg-gray-900', 'text-gray-400', 'border-gray-800');
+          });
+          pill.classList.add('bg-indigo-600', 'text-white', 'border-indigo-500');
+          pill.classList.remove('bg-gray-900', 'text-gray-400', 'border-gray-800');
+          currentCategory = pill.dataset.cat;
+          render();
+        });
+      });
+
+      // Format Radio
+      document.querySelectorAll('input[name="format-filter"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+          currentFormat = e.target.value;
+          render();
+        });
+      });
+
+      // Sort Select
+      document.getElementById('sort-select').addEventListener('change', (e) => {
+        currentSort = e.target.value;
+        render();
+      });
+
+      // View Toggle
+      const viewCardsBtn = document.getElementById('view-cards-btn');
+      const viewTableBtn = document.getElementById('view-table-btn');
+
+      viewCardsBtn.addEventListener('click', () => {
+        viewMode = 'cards';
+        viewCardsBtn.className = "p-1.5 rounded-lg bg-indigo-600 text-white";
+        viewTableBtn.className = "p-1.5 rounded-lg text-gray-400 hover:text-white";
+        render();
+      });
+
+      viewTableBtn.addEventListener('click', () => {
+        viewMode = 'table';
+        viewTableBtn.className = "p-1.5 rounded-lg bg-indigo-600 text-white";
+        viewCardsBtn.className = "p-1.5 rounded-lg text-gray-400 hover:text-white";
+        render();
+      });
+
+      // Reset filters button in empty state
+      document.getElementById('reset-filters-btn').addEventListener('click', () => {
+        currentSearch = '';
+        currentCategory = 'all';
+        currentStatus = 'all';
+        currentFormat = 'all';
+        searchInput.value = '';
+        clearSearchBtn.classList.add('hidden');
+        document.querySelectorAll('.status-filter-btn')[0].click();
+        document.querySelectorAll('.cat-pill')[0].click();
+        document.querySelectorAll('input[name="format-filter"]')[0].checked = true;
+        render();
+      });
+    }
+
+    // Initialize
+    window.addEventListener('DOMContentLoaded', () => {
+      setupEvents();
+      loadBooks();
+    });
+  </script>
+</body>
+</html>
